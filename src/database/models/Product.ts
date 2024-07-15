@@ -28,15 +28,25 @@ class Product extends Model {
   declare productName: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.TEXT,
   })
-  declare description: string;
+  declare productDescription: string;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  declare productPrice: number;
+
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare productStock: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
-  declare price: string;
+  declare productImage: string;
 }
 
 export default Product;

@@ -36,14 +36,14 @@ class AuthController {
 
     //Check whether user with above email exist or not.
     const data = await User.findOne({
-      //'findAll()' gives data in array while 'findByPK' gives in object.
+      //'findAll()' gives data in array while 'findByPk' gives in object.
       where: {
         email: email,
       },
     });
     if (!data) {
       res.status(404).json({
-        message: "No user found with tht email",
+        message: "No user found with that email",
       });
       return;
     }
@@ -61,13 +61,13 @@ class AuthController {
       {
         id: data.id,
       },
-      "password",
+      process.env.SECRET_KEY as string, //password
       {
         expiresIn: "20d",
       }
     );
     res.status(200).json({
-      message: "Log in successful",
+      message: "Logged in successfully",
       data: token,
     });
   }
