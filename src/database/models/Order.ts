@@ -7,7 +7,6 @@ import {
   UpdatedAt,
   AllowNull,
 } from "sequelize-typescript";
-import { toDefaultValue } from "sequelize/types/utils";
 
 @Table({
   tableName: "orders",
@@ -26,7 +25,7 @@ class Order extends Model {
     type: DataType.STRING,
     allowNull: false,
   })
-  declare phoneNUmber: string;
+  declare phoneNumber: string;
 
   @Column({
     type: DataType.STRING,
