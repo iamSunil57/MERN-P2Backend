@@ -32,7 +32,7 @@ User.hasMany(Product, { foreignKey: "userId" });
 Product.belongsTo(User, { foreignKey: "userId" });
 
 //Relationships between Product and Category Table:
-Category.hasOne(Product, { foreignKey: "categoryId" });
+Category.hasMany(Product, { foreignKey: "categoryId" });
 Product.belongsTo(Category, { foreignKey: "categoryId" });
 
 //Relationship between User and Cart:
