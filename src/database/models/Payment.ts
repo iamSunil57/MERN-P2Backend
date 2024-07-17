@@ -37,7 +37,6 @@ class Payment extends Model {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
   declare pidx: string;
 }
