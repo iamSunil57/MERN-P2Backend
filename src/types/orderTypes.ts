@@ -21,7 +21,7 @@ export enum PaymentMethod {
   ESEWA = "eSewa,",
 }
 
-enum PaymentStatus {
+export enum PaymentStatus {
   unpaid = "unpaid",
   paid = "paid",
 }
@@ -48,4 +48,12 @@ export enum TransactionStatus {
   PENDING = "Pending",
   INITIALIZED = "Initialized",
   REFUNDED = "Refunded",
+}
+
+export enum OrderStatus {
+  PENDING = "pending",
+  CANCELLED = "cancelled",
+  DELIVERED = "delivered",
+  ONTHEWAY = "ontheway",
+  PREPARATION = "preparation",
 }

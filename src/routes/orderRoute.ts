@@ -18,4 +18,45 @@ router
     errorHandler(orderController.verifyTransaction)
   );
 
+router
+  .route("/customer")
+  .get(
+    authMiddleware.isAuthenticated,
+    errorHandler(orderController.fetchMyOrders)
+  );
+
+router
+  .route("/customer/:id")
+  .patch(
+    authMiddleware.isAuthenticated,
+    authMiddleware.restrictTo(Role.Customer),
+    errorHandler(orderController.cancelMyOrder)
+  )
+  .get(
+    authMiddleware.isAuthenticated,
+    errorHandler(orderController.fetchedOrderDetails)
+  );
+router
+
+  //Admin Control Routes
+  .route("/admin/payment/:id")
+  .patch(
+    authMiddleware.isAuthenticated,
+    authMiddleware.restrictTo(Role.Admin),
+    errorHandler(orderController.changePaymentStatus)
+  );
+
+router
+  .route("/admin/:id")
+  .patch(
+    authMiddleware.isAuthenticated,
+    authMiddleware.restrictTo(Role.Admin),
+    errorHandler(orderController.changeOrderStatus)
+  )
+  .delete(
+    authMiddleware.isAuthenticated,
+    authMiddleware.restrictTo(Role.Admin),
+    errorHandler(orderController.deleteOrder)
+  );
+
 export default router;

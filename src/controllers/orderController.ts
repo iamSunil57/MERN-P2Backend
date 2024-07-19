@@ -1,9 +1,11 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
 import {
   KhaltiResponse,
   OrderData,
+  OrderStatus,
   PaymentMethod,
+  PaymentStatus,
   TransactionStatus,
   TransactionVerificationResponse,
 } from "../types/orderTypes";
@@ -11,7 +13,11 @@ import Order from "../database/models/Order";
 import Payment from "../database/models/Payment";
 import OrderDetails from "../database/models/OrderDetail";
 import axios from "axios";
-import { Model } from "sequelize";
+import Product from "../database/models/Product";
+
+class ExtendedOrder extends Order {
+  declare paymentId: string | null;
+}
 
 class OrderController {
   async createOrder(req: AuthRequest, res: Response): Promise<void> {
@@ -129,6 +135,159 @@ class OrderController {
         message: "Payment not verified",
       });
     }
+  }
+
+  //CUSTOMER SIDE STARTS:
+  async fetchMyOrders(req: AuthRequest, res: Response): Promise<void> {
+    const userId = req.user?.id;
+    const orders = await Order.findAll({
+      where: {
+        userId,
+      },
+      // To join paymetn table also
+      include: [
+        {
+          model: Payment,
+        },
+      ],
+    });
+    if (orders.length > 0) {
+      res.status(200).json({
+        message: "Order fetched successfully",
+        data: orders,
+      });
+    } else {
+      res.status(404).json({
+        message: "No order placed yet",
+        data: [],
+      });
+    }
+  }
+
+  async fetchedOrderDetails(req: AuthRequest, res: Response): Promise<void> {
+    const orderId = req.params.id;
+    const orderDetails = await OrderDetails.findAll({
+      where: {
+        orderId,
+      },
+      include: {
+        model: Product,
+      },
+    });
+    if (orderDetails.length > 0) {
+      res.status(200).json({
+        message: "Order details fetched successfully",
+        data: orderDetails,
+      });
+    } else {
+      res.status(404).json({
+        message: "No any order details available",
+        data: [],
+      });
+    }
+  }
+
+  async cancelMyOrder(req: AuthRequest, res: Response): Promise<void> {
+    const userId = req.user?.id;
+    const orderId = req.params.id;
+    const order: any = await Order.findAll({
+      where: {
+        userId,
+        id: orderId,
+      },
+    });
+    if (
+      order?.orderStatus === OrderStatus.ONTHEWAY ||
+      order?.orderStatus === OrderStatus.PREPARATION
+    ) {
+      res.status(200).json({
+        message:
+          "You can't cancel your order when it is ont the way or prepared",
+      });
+      return;
+    }
+    await Order.update(
+      { OrderStatus: OrderStatus.CANCELLED },
+      {
+        where: {
+          id: orderId,
+        },
+      }
+    );
+    res.status(200).json({
+      message: "Order cancelled successfully",
+    });
+  }
+
+  //ADMIN SIDE STARTS:
+  //Order status change
+  async changeOrderStatus(req: Request, res: Response): Promise<void> {
+    const orderId = req.params.id;
+    const orderStatus: OrderStatus = req.body.orderStatus;
+    await Order.update(
+      {
+        orderStatus: orderStatus,
+      },
+      {
+        where: {
+          id: orderId,
+        },
+      }
+    );
+    res.status(200).json({
+      message: "Order status updated successfully",
+    });
+  }
+
+  //Payment status change
+  async changePaymentStatus(req: AuthRequest, res: Response): Promise<void> {
+    const orderId = req.params.id;
+    const paymentStatus: PaymentStatus = req.body.paymentStatus;
+    const order = await Order.findByPk(orderId); // If 'order:any' is used we don't need to create extended class
+    const extendedOrder: ExtendedOrder = order as ExtendedOrder;
+    await Payment.update(
+      {
+        paymentStatus: paymentStatus,
+      },
+      {
+        where: {
+          id: extendedOrder.paymentId,
+        },
+      }
+    );
+    res.status(200).json({
+      message: `Payment status  of order Id ${orderId} updated successfully to ${paymentStatus}`,
+    });
+  }
+
+  //Delete order
+  async deleteOrder(req: Request, res: Response): Promise<void> {
+    const orderId = req.params.id;
+    const order = await Order.findByPk(orderId);
+    const extendedOrder: ExtendedOrder = order as ExtendedOrder;
+    if (Order) {
+      await OrderDetails.destroy({
+        where: {
+          orderId: orderId,
+        },
+      });
+      await Payment.destroy({
+        where: {
+          id: extendedOrder.paymentId,
+        },
+      });
+      await Order.destroy({
+        where: {
+          id: orderId,
+        },
+      });
+      res.status(200).json({
+        message: "Order deleted successfully",
+      });
+    } else
+      res.status(404).json({
+        message: " No order with that order Id",
+      });
   }
 }
 export default new OrderController();
