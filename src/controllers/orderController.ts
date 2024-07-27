@@ -14,6 +14,7 @@ import Payment from "../database/models/Payment";
 import OrderDetails from "../database/models/OrderDetail";
 import axios from "axios";
 import Product from "../database/models/Product";
+import Cart from "../database/models/Cart";
 
 class ExtendedOrder extends Order {
   declare paymentId: string | null;
@@ -56,23 +57,29 @@ class OrderController {
       userId,
       paymentId: paymentData.id,
     });
-    let responseOrderData;
 
+    let responseOrderData;
     for (var i = 0; i < items.length; i++) {
       responseOrderData = await OrderDetails.create({
         quantity: items[i].quantity,
         productId: items[i].productId,
         orderId: orderData.id,
       });
+      await Cart.destroy({
+        where: {
+          productId: items[i].productId,
+          userId: userId,
+        },
+      });
     }
 
     if (paymentDetails.paymentMethod.toLowerCase() === PaymentMethod.KHALTI) {
       //Khalti Integration
       const data = {
-        return_url: "http://localhost:3000/success/",
+        return_url: "http://localhost:5173/success/",
         purchase_order_id: orderData.id,
         amount: totalAmount * 100, // 'paisa' ma hunxa so * 100
-        website_url: "http://localhost:3000/",
+        website_url: "http://localhost:5173/",
         purchase_order_name: "orderName_" + orderData.id,
       };
       const response = await axios.post(
@@ -90,9 +97,9 @@ class OrderController {
       res.status(200).json({
         message: "Order placed successfully",
         url: khaltiResponse.payment_url,
+        data: responseOrderData,
       });
     } else {
-      console.log("I am inside else statement");
       res.status(200).json({
         message: "Order placed successfully.",
       });

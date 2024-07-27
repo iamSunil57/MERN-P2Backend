@@ -32,9 +32,14 @@ class CartController {
         productId,
       });
     }
+    const data = await Cart.findAll({
+      where: {
+        userId,
+      },
+    });
     res.status(200).json({
       message: "Product added to cart",
-      data: cartItem,
+      data,
     });
   }
 
@@ -80,7 +85,6 @@ class CartController {
     const { productId } = req.params;
 
     //Check whether above productId product exist or not
-
     const product = await Product.findByPk(productId);
     if (!product) {
       res.status(404).json({

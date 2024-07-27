@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from "express";
 
 const app: Application = express();
-const PORT: number = 3000;
+const PORT: number = 4000;
 
 // require("./model/index");
 import * as dotenv from "dotenv";
@@ -16,10 +16,18 @@ import categoryRoute from "./routes/categoryRoute";
 import categoryController from "./controllers/categoryController";
 import cartRoute from "./routes/cartRoute";
 import orderRoute from "./routes/orderRoute";
+import cors from "cors";
 app.use(express.json());
 
 //Admin Seeder:
 adminSeeder();
+
+//Cors to allow all protocols to access the database and backend
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 //localhost:3000/register || localhost:3000/x/register
 app.use("", userRoute);
