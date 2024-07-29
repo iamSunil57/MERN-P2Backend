@@ -113,6 +113,7 @@ class CartController {
       res.status(400).json({
         message: "Please provide product quantity",
       });
+      return;
     }
     const cartData = await Cart.findOne({
       where: {

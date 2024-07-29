@@ -19,7 +19,7 @@ router
   );
 
 router
-  .route("/customer")
+  .route("/customer/")
   .get(
     authMiddleware.isAuthenticated,
     errorHandler(orderController.fetchMyOrders)
