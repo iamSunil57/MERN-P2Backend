@@ -15,6 +15,8 @@ import OrderDetails from "../database/models/OrderDetail";
 import axios from "axios";
 import Product from "../database/models/Product";
 import Cart from "../database/models/Cart";
+import User from "../database/models/User";
+import Category from "../database/models/Category";
 
 class ExtendedOrder extends Order {
   declare paymentId: string | null;
@@ -177,9 +179,30 @@ class OrderController {
       where: {
         orderId,
       },
-      include: {
-        model: Product,
-      },
+      include: [
+        {
+          model: Product,
+          include: [
+            {
+              model: Category,
+              attributes: ["categoryName"],
+            },
+          ],
+        },
+        {
+          model: Order,
+          include: [
+            {
+              model: Payment,
+              attributes: ["paymentMethod", "paymentStatus"],
+            },
+            {
+              model: User,
+              attributes: ["username", "email"],
+            },
+          ],
+        },
+      ],
     });
     if (orderDetails.length > 0) {
       res.status(200).json({
@@ -209,12 +232,12 @@ class OrderController {
     ) {
       res.status(200).json({
         message:
-          "You can't cancel your order when it is ont the way or prepared",
+          "You can't cancel your order when it is on the way or prepared",
       });
       return;
     }
     await Order.update(
-      { OrderStatus: OrderStatus.CANCELLED },
+      { orderStatus: OrderStatus.CANCELLED },
       {
         where: {
           id: orderId,
