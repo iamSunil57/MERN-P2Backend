@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import User from "../database/models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import Payment from "../database/models/Payment";
+import { AuthRequest } from "../middleware/authMiddleware";
+import Order from "../database/models/Order";
 
 class AuthController {
   public static async registerUser(req: Request, res: Response): Promise<void> {
@@ -70,6 +73,26 @@ class AuthController {
       message: "Logged in successfully",
       data: token,
     });
+  }
+
+  //To fetch users:
+  public static async fetchUsers(
+    req: AuthRequest,
+    res: Response
+  ): Promise<void> {
+    const users = await User.findAll();
+
+    if (users.length > 0) {
+      res.status(200).json({
+        message: "Users fetched successfully",
+        data: users,
+      });
+    } else {
+      res.status(404).json({
+        message: "No users registered yet",
+        data: [],
+      });
+    }
   }
 }
 export default AuthController;

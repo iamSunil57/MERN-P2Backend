@@ -9,6 +9,11 @@ router
   .post(
     authMiddleware.isAuthenticated,
     errorHandler(orderController.createOrder)
+  )
+  .get(
+    authMiddleware.isAuthenticated,
+    authMiddleware.restrictTo(Role.Admin),
+    errorHandler(orderController.fetchOrders)
   );
 
 router
