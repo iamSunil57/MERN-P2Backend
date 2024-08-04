@@ -74,7 +74,7 @@ class CartController {
       });
     } else {
       res.status(200).json({
-        message: "Cart items fetched successfully",
+        message: "Cart items fetched Successfully",
         data: cartItems,
       });
     }
@@ -101,7 +101,7 @@ class CartController {
       },
     });
     res.status(200).json({
-      message: "Product removed from cart successfully",
+      message: "Product removed from cart Successfully",
     });
   }
 
@@ -125,7 +125,7 @@ class CartController {
       cartData.quantity = quantity;
       await cartData?.save();
       res.status(200).json({
-        message: "Product of cart updated successfully",
+        message: "Product of cart updated Successfully",
         data: cartData,
       });
     } else {
