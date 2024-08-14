@@ -323,7 +323,7 @@ class OrderController {
   //To fetch all orders:
   async fetchOrders(req: AuthRequest, res: Response): Promise<void> {
     const orders = await Order.findAll({
-      // To join paymetn table also
+      // To join payment table also
       include: [
         {
           model: Payment,
