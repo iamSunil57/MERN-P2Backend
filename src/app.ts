@@ -22,6 +22,9 @@ app.use(express.json());
 //Admin Seeder:
 adminSeeder();
 
+//Image Check:
+app.use(express.static("./src/uploads"));
+
 //Cors to allow all protocols to access the database and backend
 app.use(
   cors({

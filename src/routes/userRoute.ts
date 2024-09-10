@@ -17,4 +17,12 @@ router
     errorHandler(AuthController.fetchUsers)
   );
 
+router
+  .route("/users/:id")
+  .delete(
+    authMiddleware.isAuthenticated,
+    authMiddleware.restrictTo(Role.Admin),
+    errorHandler(AuthController.deleteUser)
+  );
+
 export default router;

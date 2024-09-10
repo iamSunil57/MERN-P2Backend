@@ -18,7 +18,7 @@ class ProductController {
 
     // Check if there's an uploaded file
     if (req.file) {
-      fileName = req.file.filename;
+      fileName = process.env.Local_Url + req.file.filename;
     } else {
       fileName =
         "https://products.shureweb.eu/shure_product_db/product_main_images/files/c25/16a/40-/original/ce632827adec4e1842caa762f10e643d.webp";

@@ -94,5 +94,23 @@ class AuthController {
       });
     }
   }
+
+  //To Delete User:
+  public static async deleteUser(
+    req: AuthRequest,
+    res: Response
+  ): Promise<void> {
+    const id = req.params.id;
+    const users = await User.destroy({
+      where: {
+        id,
+      },
+    });
+
+    res.status(404).json({
+      message: "User deleted successfully",
+      data: [],
+    });
+  }
 }
 export default AuthController;
